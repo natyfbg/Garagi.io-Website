@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  api:
+      env_file: .env
+      image: node:16-alpine
+      command: yarn start:dev
+      working_dir: /app
+      volumes:
+        - .:/app
+      ports:
+        - "8080:8080"
+      depends_on:
+        - db
+  db:
+    container_name: csc648_db
+    image: mysql:8.0.30-debian
+    environment:
+      MYSQL_DATABASE: cscdb
+      MYSQL_ROOT_PASSWORD: password648
+      MYSQL_USER: csc
+      MYSQL_PASSWORD: password
+    ports:
+      - 3306:3306
+    volumes:
+      - db_data:/var/lib/mysql
+  # api:
+  #   env_file: .env
+  #   image: node:16-alpine
+  #   command: yarn start:dev
+  #   working_dir: /app
+  #   volumes:
+  #     - "./:/app"
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - db
+volumes:
+  db_data:

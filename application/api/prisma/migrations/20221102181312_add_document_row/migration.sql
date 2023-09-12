@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `Student` ADD COLUMN `coverLetter` VARCHAR(191) NULL,
+    ADD COLUMN `cv` VARCHAR(191) NULL;

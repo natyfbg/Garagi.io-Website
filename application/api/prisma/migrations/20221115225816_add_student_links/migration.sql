@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE `Student` ADD COLUMN `github` VARCHAR(191) NULL,
+    ADD COLUMN `ig` VARCHAR(191) NULL,
+    ADD COLUMN `twitter` VARCHAR(191) NULL;

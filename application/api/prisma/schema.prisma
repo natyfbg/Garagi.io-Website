@@ -1,0 +1,142 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Regular user that registered on Garage.io
+model Student {
+  id    String  @id  @default(uuid())
+  email String  @unique
+  password  String
+
+  name  String
+  firstname String
+  bio String?
+
+  jobAlert  Boolean @default(false)
+  jobAlertTrigger String?
+
+  profilePicture String @default("default/default_profile_picture.jpg")
+  cv             String?
+  coverLetter    String?
+  github         String?
+  twitter        String?
+  ig             String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  skills        Skill[]
+  applications  JobApplication[]
+  favorites     JobPost[]
+}
+
+
+// Administrator of Garage.io
+model Administrator {
+  id          String  @id @default(uuid())
+  username    String  @unique
+  password    String
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Company account
+model Company {
+  id    String @id @default(uuid())
+  email String @unique
+  password String
+  
+  name  String
+  description String? @db.Text
+  companyLogo String? @default("default/default_company_logo.jpg")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  posts JobPost[]
+}
+
+
+// Job offer posted by company
+model JobPost {
+  id      String @id @default(uuid())
+
+  title     String
+  description String  @db.Text
+  category  JobArea
+  type  JobType
+  salary SalaryRange @default(NOT_SPECIFIED)
+  location  String?
+
+  company Company @relation(fields: [companyId], references: [id])
+  companyId String
+
+  skillsRequired  Skill[]
+  applications  JobApplication[]
+  studentLikes  Student[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+model JobApplication {
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId String
+
+  post      JobPost   @relation(fields: [postId], references: [id])
+  postId    String
+
+  rejected  Boolean   @default(false)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@id([studentId, postId])
+}
+
+model Skill {
+  id    String @id @default(uuid())
+  name  String @unique
+  
+  students  Student[]
+  jobPosts JobPost[]
+}
+
+enum JobArea {
+    AI_ML
+    RPA
+    EC
+    QC
+    VR_AR
+    BLOCKCHAIN
+    IOT
+    TELECOM_5G
+    CYBER_SECURITY
+}
+
+enum JobType {
+    INTERNSHIP
+    APPRENTICESHIP
+    FULL_TIME
+    PART_TIME
+    FREELANCE
+}
+
+enum SalaryRange {
+  NOT_SPECIFIED
+  S0_10
+  S10_30
+  S30_50
+  S50_100
+  S100
+}

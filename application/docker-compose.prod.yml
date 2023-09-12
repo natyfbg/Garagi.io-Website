@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  db:
+    container_name: csc648_db
+    image: mysql:8.0.30-debian
+    environment:
+      MYSQL_DATABASE: cscdb
+      MYSQL_ROOT_PASSWORD: password648
+      MYSQL_USER: csc
+      MYSQL_PASSWORD: password
+    ports:
+      - 3306:3306
+    networks:
+      - backend
+    volumes:
+      - db_data:/var/lib/mysql
+
+  webserver:
+    container_name: webserver
+    image: nginx:1.23.1-alpine
+    depends_on:
+      - api
+      - webapp
+    volumes:
+      - ./webserver/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - backend
+      - frontend
+    ports:
+      - 80:80
+  
+  api:
+    container_name: api 
+    image: pr0m3th3usex/csc648_api:1.0.0
+    env_file: api/.env
+    depends_on:
+      - db
+    networks:
+      - backend
+
+  webapp:
+    container_name: webapp
+    image: pr0m3th3usex/csc648_webapp:1.0.0
+    depends_on:
+      - api
+    networks:
+      - frontend
+
+volumes:
+  db_data:
+
+networks:
+  backend:
+  frontend:
